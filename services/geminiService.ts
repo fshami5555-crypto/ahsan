@@ -2,8 +2,8 @@ import { GoogleGenAI } from "@google/genai";
 
 const getAiClient = () => {
   // Fallback for demo purposes if env is missing, but strictly adhering to instructions to use process.env.API_KEY
-  // In a real scenario, ensure API_KEY is set.
-  const apiKey = process.env.API_KEY || ''; 
+  // Safe access check for browser environments
+  const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) || ''; 
   if (!apiKey) {
     console.warn("API Key is missing. AI features will not work.");
   }
@@ -13,7 +13,10 @@ const getAiClient = () => {
 export const generateTaskDescription = async (title: string): Promise<string> => {
   try {
     const ai = getAiClient();
-    if (!process.env.API_KEY) return "الرجاء ضبط مفتاح API لتوليد الوصف.";
+    // Double check safe access before using
+    const apiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY);
+    
+    if (!apiKey) return "الرجاء ضبط مفتاح API لتوليد الوصف.";
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
